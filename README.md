@@ -1,6 +1,6 @@
 # HPCTools-Task2
 
-In the file "baseline.c", you will find a method to resolve an equation of the form "AX=B", using QR decomposition, and more particularly Given's rotation matrix.(However, for a reason I don't know, the QR_givens in the main code doesn't change Q and R, but we can see with a printf that in the code QR_givens Q and R are changed. So this code doesn't work yet because of this problem.) This problem was solved with the second version, but the code is not optimized. Unfortunately, there is still a problem. Indeed, values in Q and R are too high. It is obvious that Q*R=! A. 
+In the file "baseline.c", you will find a method to resolve an equation of the form "AX=B", using QR decomposition, and more particularly Given's rotation matrix.(However, for a reason I don't know, the QR_givens in the main code doesn't change Q and R, but we can see with a printf that in the code QR_givens Q and R are changed. So this code doesn't work yet because of this problem.) This problem was solved with the second version, but the code is not optimized. Unfortunately, there is still a problem. Indeed, values in Q and R are too high. It is obvious that Q*R=! A. This may come from the function "mat_rot", in function of degrees or radian.
 
 In the pdf named "task2", you will find table with different options with several times execution, for a small matrix, a medium matrix and then a large matrix.
 
