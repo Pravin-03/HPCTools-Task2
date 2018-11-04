@@ -92,7 +92,7 @@ double *mat_rot(int size, int i, int j, double c, double s) // for QR algorithm
 	return M;
 }
 
-void QR_givens(double *Q, double *R, int size) // QR method with Givens rotation
+double *QR_givens_Q(double *Q, double *R, int size) // QR method with Givens rotation
 {
 	int j,i;
 	for(j=0;j<size-1;j++)
@@ -122,6 +122,40 @@ void QR_givens(double *Q, double *R, int size) // QR method with Givens rotation
 	}
 	//print_matrix("Rint",R,size);
 	//print_matrix("Qint",Q,size);
+	return Q;
+}
+
+double *QR_givens_R(double *Q, double *R, int size) // QR method with Givens rotation
+{
+	int j,i;
+	for(j=0;j<size-1;j++)
+	{
+		for(i=size-1;i>j;i--)
+		{
+			int position1=i;
+			int position2=i-1;
+			double r;
+			r=sqrt(R[position1*size+j]*R[position1*size+j]+R[position2*size+j]*R[position2*size+j]);
+			double *G;
+			G=generate_matrix(size);
+			G=mat_rot(size,position1,position2,R[position2*size+j]/r,R[position1*size+j]/r);
+			//print_matrix("G",G,size);
+			R=mult(G,R,size);
+			transp(G,size);                                     // in order to use it in the following multiplication
+			Q=mult(Q,G,size);
+		}
+	}
+	if(R[(size-1)*size+(size-1)]<0)
+	{
+		R[(size-1)*size+(size-1)]=R[(size-1)*size+(size-1)]*(-1);
+		for(i=0;i<size;i++)
+		{
+			Q[i*size+2]=Q[i*size+2]*(-1);
+		}
+	}
+	//print_matrix("Rint",R,size);
+	//print_matrix("Qint",Q,size);
+	return R;
 }
 
 double *resolve(double *R,double *B, int size) //solve AX=B
@@ -181,7 +215,7 @@ void main(int argc, char *argv[])
    B = generate_matrix(size);
    Bref = generate_matrix(size);
         
-   //print_matrix("A", A, size);
+   print_matrix("A", A, size);
    //print_matrix("B", B, size);
 	
 	int i;
@@ -192,26 +226,50 @@ void main(int argc, char *argv[])
 	R=generate_matrix(size);
 	Q=generate_matrix(size);
 
-	
 	for(i=0;i<size*size;i++) // Initialization of Q and R
 	{
 		R[i]=A[i];
 		Q[i]=0.0;
 	}
+	
 	for(i=0;i<size;i++)
 	{
 		Q[i*size+i]=1.0;
 	}
 	
+	//Calculus of Q and R
+	
 	//print_matrix("Q before",Q,size);
 	//print_matrix("R before",R,size);
-	QR_givens(Q,R,size);                       // Don't know why but Q and R stay the same after QR_givens
-	//print_matrix("Q after",Q,size);
-	//print_matrix("R after",R,size);
+	
+	Q=QR_givens_Q(Q,R,size);               
+	
+	// Re-initialisation of R for the code
+	
+	double *Q_int,*Q_intref;   //Q intermediate, because other Q has good values. We don't want to change Q.
+	
+	Q_int=generate_matrix(size);
+	
+	for(i=0;i<size*size;i++)
+	{
+		R[i]=A[i];
+		Q_int[i]=0.0;
+	}
+	
+	for(i=0;i<size;i++)
+	{
+		Q_int[i*size+i]=1.0;
+	}
+	
+	R=QR_givens_R(Q_int,R,size);
+	
+	
+	print_matrix("Q after",Q,size);
+	print_matrix("R after",R,size);
 	transp(Q,size);
 	double *C;
 	C=mult(Q,B,size);
 	double *X;
 	X=resolve(R,C,size);
-	//print_matrix("X",X,size);
+	print_matrix("X",X,size);
 }
