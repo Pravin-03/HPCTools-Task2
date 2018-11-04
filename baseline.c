@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+//If n>=25, this programm won't work.
 
 double *generate_matrix(int size)
 {
